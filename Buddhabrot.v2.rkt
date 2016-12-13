@@ -1,9 +1,7 @@
 #lang racket
-(require 2htdp/image
-         threading)
-
-(define dot (rectangle 1 1 'solid 'white))
-(define scene (rectangle 800 800 'solid 'black))
+(require threading
+         racket/flonum
+         images/flomap)
 
 ;; Complex Integer -> (Listof Complex)
 ;; Takes a starting Complex number and a max depth, returns a mandelbrot
@@ -35,10 +33,19 @@
     (map (λ (x) (list (exact-floor (real-part x))
                       (exact-floor (imag-part x)))) _)))
 
+(define locations-flvector
+  (make-flvector (* 800 800) 0.0))
+
 (for-each (λ (pt)
-            (set! scene (place-image dot
-                                     (first pt) (second pt)
-                                     scene)))
+            (let ([pos (+ (first pt) (* 800 (second pt)))])
+              (flvector-set! locations-flvector pos
+                           (add1 (flvector-ref locations-flvector pos)))))
           locations)
-scene
+
+(define budda (flomap locations-flvector 1 800 800))
+(~> budda
+    flomap-normalize
+    (flomap-rotate _ (* -1/2 pi))
+    (flomap-ct-crop _ 500 600)
+    flomap->bitmap)
 
