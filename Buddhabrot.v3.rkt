@@ -1,3 +1,4 @@
+;;;;;;;;;1;;;;;;;;;2;;;;;;;;;3;;;;;;;;;4;;;;;;;;;5;;;;;;;;;6;;;;;;;;;7;;
 #lang racket
 (require threading
          math/flonum
@@ -30,12 +31,13 @@
 
 ;;;;;;;;;;;;;;;
 (define locations-blue
-(~> (mandelbrot-points 1500000 50)
+(time
+(~> (mandelbrot-points 1500000 64)
     (apply append _)
     (map (λ (x) (* 400 (+ x 2.0+2.0i))) _)
     (map (λ (x) (list (exact-floor (real-part x))
-                      (exact-floor (imag-part x)))) _)))
-
+                      (exact-floor (imag-part x)))) _))))
+'location-blue
 (define locations-flvector-blue
   (make-flvector (* 1600 1600) 0.0))
 
@@ -47,7 +49,8 @@
 
 (define budda-blue (flomap locations-flvector-blue 1 1600 1600))
 
-(define blue
+(define blue-fm
+(time
 (~> budda-blue
     flomap-normalize
     flomap-values
@@ -56,16 +59,16 @@
     (apply append _)
     list->flvector
     (flomap _ 4 1600 1600)
-    (flomap-rotate _ (* -1/2 pi))))
-
+    (flomap-rotate _ (* -1/2 pi)))))
+'blue-fm
 ;;;;;;;;;;;
-(define locations-teal
-(~> (mandelbrot-points 1500000 150)
+(define locations-teal (time
+(~> (mandelbrot-points 1500000 256)
     (apply append _)
     (map (λ (x) (* 400 (+ x 2.0+2.0i))) _)
     (map (λ (x) (list (exact-floor (real-part x))
-                      (exact-floor (imag-part x)))) _)))
-
+                      (exact-floor (imag-part x)))) _))))
+'locations-teal
 (define locations-flvector-teal
   (make-flvector (* 1600 1600) 0.0))
 
@@ -77,7 +80,8 @@
 
 (define budda-teal (flomap locations-flvector-teal 1 1600 1600))
 
-(define teal
+(define teal-fm
+(time
 (~> budda-teal
     flomap-normalize
     flomap-values
@@ -86,16 +90,16 @@
     (apply append _)
     list->flvector
     (flomap _ 4 1600 1600)
-    (flomap-rotate _ (* -1/2 pi))))
-
+    (flomap-rotate _ (* -1/2 pi)))))
+'teal-fm
 ;;;;;;;;;;;
-(define locations-yellow
-(~> (mandelbrot-points 1500000 250)
+(define locations-yellow (time
+(~> (mandelbrot-points 1500000 1024)
     (apply append _)
     (map (λ (x) (* 400 (+ x 2.0+2.0i))) _)
     (map (λ (x) (list (exact-floor (real-part x))
-                      (exact-floor (imag-part x)))) _)))
-
+                      (exact-floor (imag-part x)))) _))))
+'locations-yellow
 (define locations-flvector-yellow
   (make-flvector (* 1600 1600) 0.0))
 
@@ -107,7 +111,8 @@
 
 (define budda-yellow (flomap locations-flvector-yellow 1 1600 1600))
 
-(define yellow
+(define yellow-fm
+(time
 (~> budda-yellow
     flomap-normalize
     flomap-values
@@ -116,16 +121,16 @@
     (apply append _)
     list->flvector
     (flomap _ 4 1600 1600)
-    (flomap-rotate _ (* -1/2 pi))))
-
+    (flomap-rotate _ (* -1/2 pi)))))
+'yellow-fm
 ;;;;;;;;;;;
-(define locations-red
-(~> (mandelbrot-points 1500000 500)
+(define locations-red (time
+(~> (mandelbrot-points 1500000 5120)
     (apply append _)
     (map (λ (x) (* 400 (+ x 2.0+2.0i))) _)
     (map (λ (x) (list (exact-floor (real-part x))
-                      (exact-floor (imag-part x)))) _)))
-
+                      (exact-floor (imag-part x)))) _))))
+'loc-red
 (define locations-flvector-red
   (make-flvector (* 1600 1600) 0.0))
 
@@ -137,7 +142,8 @@
 
 (define budda-red (flomap locations-flvector-red 1 1600 1600))
 
-(define red
+(define red-fm
+(time
 (~> budda-red
     flomap-normalize
     flomap-values
@@ -146,15 +152,17 @@
     (apply append _)
     list->flvector
     (flomap _ 4 1600 1600)
-    (flomap-rotate _ (* -1/2 pi))))
+    (flomap-rotate _ (* -1/2 pi)))))
+'red-fm
 
 (define black-fm (make-flomap* 1600 1600 #(1.0 0.0 0.0 0.0)))
 
+(time
 (~> black-fm
-    (fm+ blue)
-    (fm+ teal)
-    (fm+ yellow)
-    (fm+ red)
-    (flomap-scale _ 1/4)
+    (fm+ blue-fm)
+    (fm+ teal-fm)
+    (fm+ yellow-fm)
+    (fm+ red-fm)
+    (flomap-scale _ 1/2)
     flomap->bitmap
-    (send _ save-file "Buddabrot.png" 'png))
+    (send _ save-file "Buddabrot.png" 'png)))
